@@ -13,7 +13,6 @@ const studentNavItems = [
 ];
 
 const teacherNavItems = [
-  ...studentNavItems,
   { to: "/teacher", label: "Teacher Panel", icon: GraduationCap },
 ];
 

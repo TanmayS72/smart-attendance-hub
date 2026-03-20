@@ -10,7 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import Planner from "./pages/Planner";
 import WeeklyReport from "./pages/WeeklyReport";
 import Notifications from "./pages/Notifications";
-import TeacherPanel from "./pages/TeacherPanel";
+import TeacherDashboard from "./pages/TeacherDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,7 +28,7 @@ const App = () => (
             <Route path="/planner" element={<ProtectedRoute><Planner /></ProtectedRoute>} />
             <Route path="/weekly" element={<ProtectedRoute><WeeklyReport /></ProtectedRoute>} />
             <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-            <Route path="/teacher" element={<ProtectedRoute allowedRoles={["teacher", "admin"]}><TeacherPanel /></ProtectedRoute>} />
+            <Route path="/teacher" element={<ProtectedRoute allowedRoles={["teacher", "admin"]}><TeacherDashboard /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

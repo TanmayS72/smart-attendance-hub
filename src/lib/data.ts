@@ -57,9 +57,18 @@ export function getSuggestion(attended: number, total: number): string {
 }
 
 export function getOverallAttendance(subs: SubjectData[]): number {
-  const totalAttended = subs.reduce((s, sub) => s + sub.attended, 0);
-  const totalClasses = subs.reduce((s, sub) => s + sub.total, 0);
-  return getPercentage(totalAttended, totalClasses);
+  // Only include subjects that have at least one class scheduled
+  const activeSubs = subs.filter((sub) => sub.total > 0);
+  if (activeSubs.length === 0) return 0;
+  // Average of each subject's individual percentage
+  const sum = activeSubs.reduce((s, sub) => s + getPercentage(sub.attended, sub.total), 0);
+  return Math.round(sum / activeSubs.length);
+}
+
+export function getOverallCounts(subs: SubjectData[]): { attended: number; total: number } {
+  const attended = subs.reduce((s, sub) => s + sub.attended, 0);
+  const total = subs.reduce((s, sub) => s + sub.total, 0);
+  return { attended, total };
 }
 
 export const notifications = [

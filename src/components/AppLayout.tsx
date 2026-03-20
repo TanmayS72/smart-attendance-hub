@@ -1,18 +1,23 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { LayoutDashboard, Calculator, CalendarDays, Bell, GraduationCap, LogOut } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 import type { ReactNode } from "react";
 
-const navItems = [
+const studentNavItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/planner", label: "Planner", icon: Calculator },
   { to: "/weekly", label: "Weekly Report", icon: CalendarDays },
   { to: "/notifications", label: "Notifications", icon: Bell },
+];
+
+const teacherNavItems = [
+  ...studentNavItems,
   { to: "/teacher", label: "Teacher Panel", icon: GraduationCap },
 ];
 
-function SidebarLink({ to, label, icon: Icon }: (typeof navItems)[0]) {
+function SidebarLink({ to, label, icon: Icon }: (typeof studentNavItems)[0]) {
   const location = useLocation();
   const active = location.pathname === to;
   return (
@@ -32,6 +37,15 @@ function SidebarLink({ to, label, icon: Icon }: (typeof navItems)[0]) {
 }
 
 export function AppLayout({ children }: { children: ReactNode }) {
+  const { role, signOut } = useAuth();
+  const navigate = useNavigate();
+  const navItems = role === "teacher" || role === "admin" ? teacherNavItems : studentNavItems;
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Desktop sidebar */}
@@ -47,13 +61,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </nav>
           <div className="p-3 border-t flex items-center justify-between">
             <ThemeToggle />
-            <NavLink
-              to="/"
+            <button
+              onClick={handleLogout}
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <LogOut className="h-4 w-4" />
               Logout
-            </NavLink>
+            </button>
           </div>
         </aside>
         <main className="flex-1 ml-60 min-h-screen">

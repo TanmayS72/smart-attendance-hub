@@ -55,12 +55,36 @@ export default function Landing() {
         if (error) throw error;
         toast.success("Check your email to verify your account!");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data: signInData, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        // Navigation handled by useEffect above
+
+        if (signInData.user) {
+          // Resolve the real role from DB or metadata
+          const { data: roleRow } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", signInData.user.id)
+            .single();
+
+          const actualRole =
+            (roleRow?.role as Role | undefined) ??
+            (signInData.user.user_metadata?.role as Role | undefined) ??
+            "student";
+
+          if (actualRole !== role) {
+            // Wrong login form — sign out and show a clear error
+            await supabase.auth.signOut();
+            toast.error(
+              `This is a ${actualRole} account. Please select "${actualRole === "teacher" ? "Teacher" : "Student"}" and try again.`
+            );
+            setLoading(false);
+            return;
+          }
+        }
+        // Navigation is handled by the useEffect above (waits for role to load)
       }
     } catch (err: any) {
       toast.error(err.message || "Authentication failed");

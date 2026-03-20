@@ -36,7 +36,7 @@ function SidebarLink({ to, label, icon: Icon }: (typeof studentNavItems)[0]) {
 }
 
 export function AppLayout({ children }: { children: ReactNode }) {
-  const { role, signOut } = useAuth();
+  const { role, signOut, updateRole } = useAuth();
   const navigate = useNavigate();
   const navItems = role === "teacher" || role === "admin" ? teacherNavItems : studentNavItems;
 
@@ -58,15 +58,26 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <SidebarLink key={item.to} {...item} />
             ))}
           </nav>
-          <div className="p-3 border-t flex items-center justify-between">
-            <ThemeToggle />
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <LogOut className="h-4 w-4" />
-              Logout
-            </button>
+          <div className="p-3 border-t space-y-2">
+            {role === "student" && (
+              <button
+                onClick={() => updateRole("teacher").then(() => navigate("/teacher"))}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/20"
+              >
+                <GraduationCap className="h-4 w-4" />
+                Switch to Teacher View
+              </button>
+            )}
+            <div className="flex items-center justify-between">
+              <ThemeToggle />
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </button>
+            </div>
           </div>
         </aside>
         <main className="flex-1 ml-60 min-h-screen">
@@ -76,9 +87,21 @@ export function AppLayout({ children }: { children: ReactNode }) {
 
       {/* Mobile layout */}
       <div className="md:hidden flex flex-col min-h-screen">
-        <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-lg border-b px-4 py-3 flex items-center justify-between">
-          <h1 className="text-base font-bold">📋 Smart Attendance</h1>
-          <ThemeToggle />
+        <header className="sticky top-0 z-30 bg-card/80 backdrop-blur-lg border-b px-4 py-3 flex items-center justify-between gap-3">
+          <h1 className="text-base font-bold truncate">📋 Smart Attendance</h1>
+          <div className="flex items-center gap-2">
+            {role === "student" && (
+              <button
+                onClick={() => updateRole("teacher").then(() => navigate("/teacher"))}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-primary/10 text-primary border border-primary/20 transition-colors"
+                title="Switch to Teacher View"
+              >
+                <GraduationCap className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Teacher View</span>
+              </button>
+            )}
+            <ThemeToggle />
+          </div>
         </header>
         <main className="flex-1 p-4 pb-20">{children}</main>
         <nav className="fixed bottom-0 inset-x-0 z-30 bg-card/80 backdrop-blur-lg border-t flex justify-around py-2">

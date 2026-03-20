@@ -5,19 +5,68 @@ import { GraduationCap, Users, ArrowRight, BookOpen, BarChart3, Bell } from "luc
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 type Role = "student" | "teacher";
+type AuthMode = "signin" | "signup";
 
 export default function Landing() {
   const [role, setRole] = useState<Role>("student");
+  const [mode, setMode] = useState<AuthMode>("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { user, role: userRole } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && userRole) {
+      navigate(userRole === "teacher" ? "/teacher" : "/dashboard", { replace: true });
+    }
+  }, [user, userRole, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Backend-ready: replace with actual auth
-    navigate(role === "teacher" ? "/teacher" : "/dashboard");
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    if (mode === "signup" && !fullName) {
+      toast.error("Please enter your full name");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (mode === "signup") {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { full_name: fullName, role },
+            emailRedirectTo: window.location.origin,
+          },
+        });
+        if (error) throw error;
+        toast.success("Check your email to verify your account!");
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+        // Navigation handled by useEffect above
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Authentication failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const features = [
@@ -28,7 +77,6 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 border-b bg-card/50 backdrop-blur-md sticky top-0 z-40">
         <div className="flex items-center gap-2">
           <span className="text-xl">📋</span>
@@ -82,8 +130,14 @@ export default function Landing() {
             className="w-full max-w-sm"
           >
             <div className="rounded-2xl border bg-card p-8 shadow-lg shadow-foreground/[0.03]">
-              <h2 className="text-xl font-bold mb-1">Welcome back</h2>
-              <p className="text-sm text-muted-foreground mb-6">Sign in to your account to continue</p>
+              <h2 className="text-xl font-bold mb-1">
+                {mode === "signin" ? "Welcome back" : "Create account"}
+              </h2>
+              <p className="text-sm text-muted-foreground mb-6">
+                {mode === "signin"
+                  ? "Sign in to your account to continue"
+                  : "Sign up to start tracking attendance"}
+              </p>
 
               {/* Role toggle */}
               <div className="flex rounded-xl bg-secondary p-1 mb-6">
@@ -93,6 +147,7 @@ export default function Landing() {
                 ] as const).map((r) => (
                   <button
                     key={r.key}
+                    type="button"
                     onClick={() => setRole(r.key)}
                     className={cn(
                       "flex-1 flex items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium transition-all",
@@ -107,7 +162,19 @@ export default function Landing() {
                 ))}
               </div>
 
-              <form onSubmit={handleLogin} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {mode === "signup" && (
+                  <div>
+                    <label className="text-sm font-medium mb-1.5 block">Full Name</label>
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      placeholder="Your full name"
+                      className="w-full h-10 px-3 rounded-lg border bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
+                    />
+                  </div>
+                )}
                 <div>
                   <label className="text-sm font-medium mb-1.5 block">Email</label>
                   <input
@@ -128,15 +195,42 @@ export default function Landing() {
                     className="w-full h-10 px-3 rounded-lg border bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring transition-shadow"
                   />
                 </div>
-                <Button type="submit" className="w-full h-11 text-sm font-semibold gap-2 group">
-                  Sign in as {role === "student" ? "Student" : "Teacher"}
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                <Button type="submit" className="w-full h-11 text-sm font-semibold gap-2 group" disabled={loading}>
+                  {loading ? (
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                  ) : (
+                    <>
+                      {mode === "signin" ? "Sign in" : "Sign up"} as {role === "student" ? "Student" : "Teacher"}
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                    </>
+                  )}
                 </Button>
               </form>
 
               <p className="text-center text-xs text-muted-foreground mt-5">
-                Don't have an account?{" "}
-                <button className="text-primary font-medium hover:underline">Sign up</button>
+                {mode === "signin" ? (
+                  <>
+                    Don't have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setMode("signup")}
+                      className="text-primary font-medium hover:underline"
+                    >
+                      Sign up
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Already have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setMode("signin")}
+                      className="text-primary font-medium hover:underline"
+                    >
+                      Sign in
+                    </button>
+                  </>
+                )}
               </p>
             </div>
           </motion.div>

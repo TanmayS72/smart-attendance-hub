@@ -17,7 +17,7 @@ const teacherNavItems = [
   { to: "/teacher", label: "Teacher Panel", icon: GraduationCap },
 ];
 
-function SidebarLink({ to, label, icon: Icon }: (typeof navItems)[0]) {
+function SidebarLink({ to, label, icon: Icon }: (typeof studentNavItems)[0]) {
   const location = useLocation();
   const active = location.pathname === to;
   return (

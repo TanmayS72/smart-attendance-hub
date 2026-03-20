@@ -5,11 +5,15 @@ import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
 import type { ReactNode } from "react";
 
-const navItems = [
+const studentNavItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/planner", label: "Planner", icon: Calculator },
   { to: "/weekly", label: "Weekly Report", icon: CalendarDays },
   { to: "/notifications", label: "Notifications", icon: Bell },
+];
+
+const teacherNavItems = [
+  ...studentNavItems,
   { to: "/teacher", label: "Teacher Panel", icon: GraduationCap },
 ];
 

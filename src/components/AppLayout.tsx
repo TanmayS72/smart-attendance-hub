@@ -37,6 +37,15 @@ function SidebarLink({ to, label, icon: Icon }: (typeof navItems)[0]) {
 }
 
 export function AppLayout({ children }: { children: ReactNode }) {
+  const { role, signOut } = useAuth();
+  const navigate = useNavigate();
+  const navItems = role === "teacher" || role === "admin" ? teacherNavItems : studentNavItems;
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Desktop sidebar */}
@@ -52,13 +61,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </nav>
           <div className="p-3 border-t flex items-center justify-between">
             <ThemeToggle />
-            <NavLink
-              to="/"
+            <button
+              onClick={handleLogout}
               className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               <LogOut className="h-4 w-4" />
               Logout
-            </NavLink>
+            </button>
           </div>
         </aside>
         <main className="flex-1 ml-60 min-h-screen">

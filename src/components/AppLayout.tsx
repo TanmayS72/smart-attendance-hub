@@ -1,5 +1,5 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Calculator, CalendarDays, Bell, GraduationCap, LogOut } from "lucide-react";
+import { LayoutDashboard, Calculator, CalendarDays, Bell, GraduationCap, LogOut, Trophy } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,6 +10,7 @@ const studentNavItems = [
   { to: "/planner", label: "Planner", icon: Calculator },
   { to: "/weekly", label: "Weekly Report", icon: CalendarDays },
   { to: "/notifications", label: "Notifications", icon: Bell },
+  { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
 ];
 
 const teacherNavItems = [

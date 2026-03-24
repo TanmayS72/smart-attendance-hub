@@ -231,6 +231,17 @@ export type Database = {
         Args: { p_student_id: string }
         Returns: undefined
       }
+      get_leaderboard: {
+        Args: never
+        Returns: {
+          attendance_pct: number
+          attended_classes: number
+          avatar_url: string
+          full_name: string
+          total_classes: number
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

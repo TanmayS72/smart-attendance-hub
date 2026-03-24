@@ -52,51 +52,27 @@ export type Database = {
           },
         ]
       }
-      profiles: {
+      badges: {
         Row: {
-          avatar_url: string | null
-          created_at: string
-          full_name: string | null
+          badge_icon: string
+          badge_name: string
+          earned_at: string
           id: string
-          updated_at: string
           user_id: string
         }
         Insert: {
-          avatar_url?: string | null
-          created_at?: string
-          full_name?: string | null
+          badge_icon?: string
+          badge_name: string
+          earned_at?: string
           id?: string
-          updated_at?: string
           user_id: string
         }
         Update: {
-          avatar_url?: string | null
-          created_at?: string
-          full_name?: string | null
+          badge_icon?: string
+          badge_name?: string
+          earned_at?: string
           id?: string
-          updated_at?: string
           user_id?: string
-        }
-        Relationships: []
-      }
-      subjects: {
-        Row: {
-          code: string | null
-          created_at: string
-          id: string
-          name: string
-        }
-        Insert: {
-          code?: string | null
-          created_at?: string
-          id?: string
-          name: string
-        }
-        Update: {
-          code?: string | null
-          created_at?: string
-          id?: string
-          name?: string
         }
         Relationships: []
       }
@@ -127,6 +103,57 @@ export type Database = {
         }
         Relationships: []
       }
+      points_log: {
+        Row: {
+          created_at: string
+          id: string
+          points: number
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points?: number
+          reason: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points?: number
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       student_subjects: {
         Row: {
           enrolled_at: string
@@ -145,6 +172,35 @@ export type Database = {
           id?: string
           student_id?: string
           subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_subjects_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subjects: {
+        Row: {
+          code: string | null
+          created_at: string
+          id: string
+          name: string
+        }
+        Insert: {
+          code?: string | null
+          created_at?: string
+          id?: string
+          name: string
+        }
+        Update: {
+          code?: string | null
+          created_at?: string
+          id?: string
+          name?: string
         }
         Relationships: []
       }
@@ -171,6 +227,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      enroll_student_in_all_subjects: {
+        Args: { p_student_id: string }
+        Returns: undefined
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

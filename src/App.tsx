@@ -11,6 +11,7 @@ import Planner from "./pages/Planner";
 import WeeklyReport from "./pages/WeeklyReport";
 import Notifications from "./pages/Notifications";
 import TeacherDashboard from "./pages/TeacherDashboard";
+import Leaderboard from "./pages/Leaderboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

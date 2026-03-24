@@ -10,6 +10,7 @@ const studentNavItems = [
   { to: "/planner", label: "Planner", icon: Calculator },
   { to: "/weekly", label: "Weekly Report", icon: CalendarDays },
   { to: "/notifications", label: "Notifications", icon: Bell },
+  { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
 ];
 
 const teacherNavItems = [

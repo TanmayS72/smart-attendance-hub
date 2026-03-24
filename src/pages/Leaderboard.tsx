@@ -57,7 +57,7 @@ export default function Leaderboard() {
     staleTime: 1000 * 30,
   });
 
-  const sorted = [...entries].sort((a, b) => b.points - a.points).map((e, i) => ({ ...e, rank: i + 1 }));
+  const sorted = [...entries].sort((a, b) => b.attendance_pct - a.attendance_pct || b.attended_classes - a.attended_classes || b.points - a.points).map((e, i) => ({ ...e, rank: i + 1 }));
   const top3 = sorted.slice(0, 3);
   const rest = sorted.slice(3);
 
